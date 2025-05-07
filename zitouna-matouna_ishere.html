@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZITOUNA MATOUNA - The Ruthless Chess AI</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #000;
+            color: #ff0000;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000;
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000; }
+            50% { text-shadow: 0 0 15px #ff0000, 0 0 30px #ff0000; }
+            100% { text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000; }
+        }
+        
+        .warning {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: #ff6600;
+        }
+        
+        .description {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            text-align: justify;
+            line-height: 1.6;
+        }
+        
+        .challenge-btn {
+            background-color: #990000;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 0 10px #ff0000;
+            margin-bottom: 30px;
+        }
+        
+        .challenge-btn:hover {
+            background-color: #ff0000;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px #ff0000;
+        }
+        
+        .ai-image {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            border-radius: 50%;
+            background-color: #333;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px #ff0000;
+        }
+        
+        .eye {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-color: #ff0000;
+            border-radius: 50%;
+            top: 50px;
+        }
+        
+        .eye-left {
+            left: 40px;
+        }
+        
+        .eye-right {
+            right: 40px;
+        }
+        
+        .pupil {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: #000;
+            border-radius: 50%;
+            top: 15px;
+            left: 15px;
+            animation: look 3s infinite;
+        }
+        
+        @keyframes look {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(5px, 5px); }
+            50% { transform: translate(0, -5px); }
+            75% { transform: translate(-5px, 5px); }
+            100% { transform: translate(0, 0); }
+        }
+        
+        .mouth {
+            position: absolute;
+            width: 100px;
+            height: 40px;
+            bottom: 40px;
+            left: 50px;
+            background-color: #000;
+            border-bottom: 4px solid #ff0000;
+            border-radius: 0 0 50% 50%;
+        }
+        
+        .taunt {
+            margin-top: 30px;
+            font-size: 1.2rem;
+            color: #ff3333;
+            font-style: italic;
+        }
+        
+        #taunts {
+            min-height: 60px;
+        }
+        
+        .chess-board {
+            margin: 30px auto;
+            max-width: 500px;
+            border: 3px solid #ff0000;
+            box-shadow: 0 0 20px #ff0000;
+        }
+        
+        #board-container {
+            width: 400px;
+            margin: 0 auto;
+        }
+        
+        #chess-container {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        #game-header {
+            font-size: 1.8rem;
+            color: #ff0000;
+            margin-bottom: 20px;
+            text-shadow: 0 0 5px #ff0000;
+        }
+        
+        .back-btn {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin-top: 20px;
+        }
+        
+        .back-btn:hover {
+            background-color: #555;
+        }
+        
+        .glitch {
+            animation: glitch 1s infinite;
+            opacity: 0.8;
+        }
+        
+        @keyframes glitch {
+            0% { transform: translate(0, 0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+            60% { transform: translate(-2px, -2px); }
+            80% { transform: translate(2px, 2px); }
+            100% { transform: translate(0, 0); }
+        }
+        
+        .scan-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="scan-lines"></div>
+    <div class="container">
+        <div id="intro-screen">
+            <h1 class="glitch">ZITOUNA MATOUNA</h1>
+            <div class="warning">⚠️ WARNING: PROCEED AT YOUR OWN RISK ⚠️</div>
+            
+            <div class="ai-image">
+                <div class="eye eye-left">
+                    <div class="pupil"></div>
+                </div>
+                <div class="eye eye-right">
+                    <div class="pupil"></div>
+                </div>
+                <div class="mouth"></div>
+            </div>
+            
+            <div class="description">
+                You have encountered ZITOUNA MATOUNA, the most ruthless chess AI in Tunisia.
+                Undefeated and merciless, she has crushed every opponent who dared to challenge her.
+                Her strategic brilliance is unmatched, her moves unpredictable, and her endgame devastating.
+                Think carefully before you make your move - Tunisia's chess champion shows no mercy.
+            </div>
+            
+            <div id="taunts" class="taunt"></div>
+            
+            <button class="challenge-btn" id="challenge">DARE TO CHALLENGE</button>
+        </div>
+        
+        <div id="chess-container">
+            <div id="game-header">FACE YOUR DOOM AGAINST ZITOUNA MATOUNA</div>
+            <div id="board-container" class="chess-board"></div>
+            <div id="game-taunts" class="taunt"></div>
+            <button class="back-btn" id="surrender">SURRENDER</button>
+        </div>
+    </div>
+
+    
+<script>
+    const stockfish = new Worker("https://cdn.jsdelivr.net/npm/stockfish@15.1.0/dist/stockfish.min.js");
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+    <script>
+        // Taunts for the intro screen
+        const introTaunts = [
+            "Tunisia's chess champion awaits your challenge...",
+            "No player in Tunisia has ever defeated me.",
+            "Your moves are already written in my victory algorithm.",
+            "The best minds in Tunisia created me to be unbeatable.",
+            "My strategies have crushed champions across Tunisia.",
+            "Are you brave enough to face Tunisia's chess master?"
+        ];
+        
+        // Taunts during gameplay
+        const gameTaunts = [
+            "Tunisia's champion sees your strategy unfolding...",
+            "Your move was anticipated. My response is inevitable.",
+            "The masters of Tunisia taught me this position.",
+            "Your king cannot escape ZITOUNA MATOUNA's grasp.",
+            "Tunisia's finest chess minds designed my endgame.",
+            "Your strategy is known to me. Your defeat is calculated."
+        ];
+        
+        // Display random taunts on the intro screen
+        function showRandomTaunt() {
+            const tauntElement = document.getElementById('taunts');
+            const randomTaunt = introTaunts[Math.floor(Math.random() * introTaunts.length)];
+            tauntElement.textContent = randomTaunt;
+        }
+        
+        // Show random game taunts
+        function showGameTaunt() {
+            const tauntElement = document.getElementById('game-taunts');
+            const randomTaunt = gameTaunts[Math.floor(Math.random() * gameTaunts.length)];
+            tauntElement.textContent = randomTaunt;
+        }
+        
+        // Initialize the intro screen
+        window.onload = function() {
+            showRandomTaunt();
+            setInterval(showRandomTaunt, 8000);
+            
+            document.getElementById('challenge').addEventListener('click', function() {
+                document.getElementById('intro-screen').style.display = 'none';
+                document.getElementById('chess-container').style.display = 'block';
+                initializeChessGame();
+                setInterval(showGameTaunt, 12000);
+            });
+            
+            document.getElementById('surrender').addEventListener('click', function() {
+                document.getElementById('intro-screen').style.display = 'block';
+                document.getElementById('chess-container').style.display = 'none';
+            });
+        };
+        
+        // Chess game functionality
+        function initializeChessGame() {
+            window.chess = new Chess();
+            const config = {
+                draggable: true,
+                position: 'start',
+                onDragStart: onDragStart,
+                onDrop: onDrop,
+                onSnapEnd: onSnapEnd,
+                pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+            };
+            window.board = Chessboard('board-container', config);
+            
+            // Only allow moving pieces if it's the player's turn
+            function onDragStart(source, piece) {
+                // Do not pick up pieces if the game is over
+                if (chess.game_over()) return false;
+                
+                // Only pick up player's pieces (white)
+                if (piece.search(/^b/) !== -1) return false;
+            }
+            
+            function onDrop(source, target) {
+                // See if the move is legal
+                const move = chess.move({
+                    from: source,
+                    to: target,
+                    promotion: 'q' // Always promote to a queen for simplicity
+                });
+                
+                // Illegal move
+                if (move === null) return 'snapback';
+                
+                // Make the AI move after a short delay
+                window.setTimeout(makeAIMove, 250);
+            }
+            
+            // Update the board position after the piece snap animation
+            function onSnapEnd() {
+                board.position(chess.fen());
+            }
+            
+            // AI makes a move (using Stockfish via web worker if available)
+            function makeAIMove() {
+                stockfish.postMessage("uci");
+                stockfish.postMessage("ucinewgame");
+                stockfish.postMessage("position fen " + chess.fen());
+                stockfish.postMessage("go depth 15");
+
+                stockfish.onmessage = function(event) {
+                    const line = event.data;
+                    if (line.startsWith("bestmove")) {
+                        const move = line.split(" ")[1];
+                        const from = move.substring(0, 2);
+                        const to = move.substring(2, 4);
+                        const promotion = move.length === 5 ? move[4] : undefined;
+
+                        const result = chess.move({
+                            from,
+                            to,
+                            promotion
+                        });
+
+                        if (result !== null) {
+                            board.position(chess.fen());
+                            showGameTaunt();
+                        }
+                    }
+                };
+            }
+        }
+    </script>
+</body>
+</html>
